@@ -1,0 +1,2528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Cyber Runner 3D - Wardrobe Edition</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    /* --- Cyberpunk Scrollbar --- */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #090d16;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #0284c7;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #38bdf8;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #05070f !important;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    #canvas-container {
+      width: 100%;
+      height: 100%;
+      display: block;
+      background: #05070f !important;
+    }
+
+    /* --- Overlays & Modals --- */
+    .screen-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      padding: 20px;
+      text-align: center;
+      transition: opacity 0.2s ease;
+    }
+    .screen-overlay.hidden {
+      display: none !important;
+    }
+
+    /* --- HOME SCREEN (Back to Classic Cyber Blue Theme) --- */
+    #home-screen {
+      background: radial-gradient(circle at center, rgba(14, 23, 42, 0.7) 0%, #05070f 85%) !important;
+    }
+    .logo-container {
+      margin-bottom: 16px;
+      animation: floatLogo 4s ease-in-out infinite;
+    }
+    @keyframes floatLogo {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+    .game-tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      padding: 4px 14px;
+      border-radius: 999px;
+      margin-bottom: 8px;
+    }
+    h1.main-title {
+      font-size: 50px;
+      font-weight: 900;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      line-height: 1;
+      text-shadow: 0 0 35px rgba(56, 189, 248, 0.8), 0 0 10px rgba(56, 189, 248, 0.4);
+    }
+    .sub-title {
+      color: #94a3b8;
+      font-size: 13px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-top: 8px;
+    }
+
+    .home-top-bar {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .top-stat-pill {
+      background: #0f172ae6;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      padding: 7px 18px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .menu-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+      max-width: 320px;
+    }
+    .menu-btn {
+      background: #0f172af2;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      padding: 13px 20px;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+      transition: all 0.15s ease;
+    }
+    .menu-btn:hover {
+      background: #1e293b;
+      border-color: #38bdf8;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(56, 189, 248, 0.3);
+    }
+    .menu-btn:active { transform: translateY(1px); }
+    .menu-btn.primary {
+      background: linear-gradient(135deg, #0284c7, #06b6d4);
+      border: none;
+      font-size: 17px;
+      padding: 15px 22px;
+      box-shadow: 0 4px 22px rgba(6, 182, 212, 0.5);
+    }
+    .menu-btn.primary:hover {
+      box-shadow: 0 8px 30px rgba(6, 182, 212, 0.75);
+    }
+
+    /* --- WARDROBE MODAL --- */
+    .modal-box {
+      background: #0f172afc;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 580px;
+      max-height: 88vh;
+      overflow-y: auto;
+      padding: 24px;
+      box-shadow: 0 10px 45px rgba(0, 0, 0, 0.8);
+      text-align: left;
+    }
+    .modal-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Shop Wallet Banner */
+    .shop-wallet-banner {
+      background: linear-gradient(90deg, rgba(234, 179, 8, 0.16), rgba(56, 189, 248, 0.12));
+      border: 1px solid rgba(234, 179, 8, 0.4);
+      border-radius: 14px;
+      padding: 10px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .shop-wallet-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #cbd5e1;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .shop-wallet-amount {
+      font-size: 20px;
+      font-weight: 900;
+      color: #facc15;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Category Navigation Tabs: hat, shirt, pants, costume, skin color */
+    .shop-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 14px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+    .shop-tab-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #94a3b8;
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      text-transform: uppercase;
+      transition: all 0.15s;
+    }
+    .shop-tab-btn:hover {
+      background: rgba(56, 189, 248, 0.15);
+      color: #fff;
+    }
+    .shop-tab-btn.active {
+      background: #0284c7;
+      border-color: #38bdf8;
+      color: #fff;
+      box-shadow: 0 2px 14px rgba(2, 132, 199, 0.5);
+    }
+
+    /* Grid of 5 Items */
+    .skin-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .skin-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .skin-card:hover {
+      border-color: #38bdf888;
+      background: rgba(56, 189, 248, 0.06);
+    }
+    .skin-card.selected {
+      border-color: #38bdf8;
+      background: rgba(56, 189, 248, 0.14);
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+    }
+    .item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Real 3D Rotating Canvas Viewport */
+    .item-canvas-box {
+      height: 75px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+    .item-canvas-box canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .item-info strong {
+      display: block;
+      color: #fff;
+      font-size: 13px;
+    }
+    .item-info span {
+      font-size: 11px;
+      color: #94a3b8;
+    }
+    .skin-btn {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+    .skin-btn.equip { background: #0284c7; color: #fff; }
+    .skin-btn.equip:hover { background: #0369a1; }
+    .skin-btn.equipped { background: #10b981; color: #fff; cursor: default; }
+    .skin-btn.buy { background: #eab308; color: #000; }
+    .skin-btn.buy:hover { background: #ca8a04; }
+    .skin-btn.locked { background: #334155; color: #94a3b8; cursor: not-allowed; }
+
+    /* Missions List */
+    .mission-item {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    .mission-desc strong { display: block; color: #fff; font-size: 13px; }
+    .mission-desc span { font-size: 11px; color: #94a3b8; }
+    .mission-badge {
+      background: #facc1526;
+      border: 1px solid #facc1566;
+      color: #facc15;
+      font-weight: 800;
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+    .mission-badge.done {
+      background: #10b98126;
+      border-color: #10b98166;
+      color: #34d399;
+    }
+
+    /* Notification Banner */
+    #notification-toast {
+      position: absolute;
+      top: 75px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-20px);
+      background: #0f172af4;
+      border: 1px solid #38bdf8;
+      box-shadow: 0 4px 20px rgba(56, 189, 248, 0.4);
+      padding: 10px 24px;
+      border-radius: 999px;
+      color: #fff;
+      font-weight: 800;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 100;
+      pointer-events: none;
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #notification-toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* --- IN-GAME HUD --- */
+    #hud-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 16px;
+      z-index: 10;
+    }
+    #hud-layer.hidden { display: none !important; }
+    .hud-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      width: 100%;
+      gap: 10px;
+    }
+    .hud-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .badge {
+      background: #0f172ae6;
+      padding: 7px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .val-score { color: #38bdf8; font-weight: 800; }
+    .val-coins { color: #facc15; font-weight: 800; }
+    .val-sector { color: #38bdf8; font-weight: 800; }
+    .val-fps { color: #4ade80; font-weight: 800; font-size: 11px; }
+
+    .status-bar-container {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .status-item {
+      display: none;
+      background: #0f172af0;
+      border-radius: 8px;
+      padding: 6px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      align-items: center;
+      gap: 8px;
+      min-width: 130px;
+    }
+    .status-progress {
+      flex: 1;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .status-fill { height: 100%; width: 100%; }
+    .fill-shield { background: #10b981; }
+    .fill-magnet { background: #06b6d4; }
+    .fill-boost { background: #f59e0b; }
+
+    .top-actions {
+      pointer-events: auto;
+      display: flex;
+      gap: 8px;
+    }
+    .icon-btn {
+      background: #0f172ae6;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 15px;
+      transition: background 0.15s;
+    }
+    .icon-btn:hover {
+      background: #38bdf84d;
+      border-color: #38bdf8;
+    }
+
+    /* Game Over & Stats */
+    .stats-summary {
+      display: flex;
+      gap: 14px;
+      margin: 18px 0;
+    }
+    .stat-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 10px 18px;
+    }
+    .stat-card .label { font-size: 11px; color: #94a3b8; text-transform: uppercase; }
+    .stat-card .value { font-size: 22px; font-weight: 800; color: #fff; }
+
+    @media (max-width: 600px) {
+      h1.main-title { font-size: 38px; }
+      .skin-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+  <div id="canvas-container"></div>
+  <div id="notification-toast">✨ LOOK UPDATED!</div>
+
+  <!-- ==================== HOME SCREEN ==================== -->
+  <div id="home-screen" class="screen-overlay">
+    <div class="logo-container">
+      <div class="game-tag">CYBER CUBE RUNNER</div>
+      <h1 class="main-title">CYBER RUNNER</h1>
+      <div class="sub-title">High-Velocity 3D Endless Odyssey</div>
+    </div>
+
+    <div class="home-top-bar">
+      <div class="top-stat-pill">🏆 Best: <span id="home-high-score" style="color: #a855f7;">0 m</span></div>
+      <div class="top-stat-pill">💰 Bank: <span id="home-total-orbs" style="color: #facc15;">0</span></div>
+    </div>
+
+    <div class="menu-panel">
+      <button id="btn-play" class="menu-btn primary"><span>▶</span> LAUNCH MISSION</button>
+      <button id="btn-hangar" class="menu-btn"><span>🎩</span> WARDROBE</button>
+      <button id="btn-missions" class="menu-btn"><span>🎯</span> MISSIONS</button>
+      <button id="btn-how-to-play" class="menu-btn"><span>🎮</span> HOW TO PLAY</button>
+      <button id="btn-settings" class="menu-btn"><span>⚙️</span> SETTINGS</button>
+    </div>
+  </div>
+
+  <!-- ==================== MODULAR WARDROBE MODAL ==================== -->
+  <div id="hangar-modal" class="screen-overlay hidden">
+    <div class="modal-box">
+      <div class="modal-title">
+        <span>🎩 WARDROBE</span>
+        <button id="btn-close-hangar" class="icon-btn">✕</button>
+      </div>
+
+      <!-- Prominent Orbs Balance Indicator -->
+      <div class="shop-wallet-banner">
+        <div>
+          <div class="shop-wallet-title">Your Orbs Balance</div>
+          <div style="font-size: 11px; color: #94a3b8;">Earn more orbs during missions to unlock custom items!</div>
+        </div>
+        <div class="shop-wallet-amount">
+          <span>💰</span>
+          <span id="shop-wallet-val">0</span>
+        </div>
+      </div>
+
+      <!-- Specific Categories Requested: hat, shirt, pants, costume, skin color -->
+      <div class="shop-tabs">
+        <button class="shop-tab-btn active" data-category="hat">hat</button>
+        <button class="shop-tab-btn" data-category="shirt">shirt</button>
+        <button class="shop-tab-btn" data-category="pants">pants</button>
+        <button class="shop-tab-btn" data-category="costume">costume</button>
+        <button class="shop-tab-btn" data-category="skin color">skin color</button>
+      </div>
+
+      <!-- Grid of 5 Items with Real Rotating 3D Model Icons -->
+      <div class="skin-grid" id="wardrobe-items-container">
+        <!-- Injected via JavaScript -->
+      </div>
+
+      <button id="btn-hangar-back" class="menu-btn" style="width: 100%;">BACK TO MENU</button>
+    </div>
+  </div>
+
+  <!-- ==================== MISSIONS MODAL ==================== -->
+  <div id="missions-modal" class="screen-overlay hidden" style="background: rgba(5,7,15,0.88);">
+    <div class="modal-box">
+      <div class="modal-title">
+        <span>🎯 Active Directives</span>
+        <button id="btn-close-missions" class="icon-btn">✕</button>
+      </div>
+      <p style="color: #94a3b8; font-size: 13px; margin-bottom: 14px;">Complete objectives during runs to earn bonus bank orbs:</p>
+      <div id="missions-list-container"></div>
+      <button id="btn-missions-back" class="menu-btn" style="width: 100%;">CLOSE</button>
+    </div>
+  </div>
+
+  <!-- ==================== HOW TO PLAY MODAL ==================== -->
+  <div id="guide-modal" class="screen-overlay hidden" style="background: rgba(5,7,15,0.88);">
+    <div class="modal-box">
+      <div class="modal-title">
+        <span>🎮 Flight Guide</span>
+        <button id="btn-close-guide" class="icon-btn">✕</button>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px; font-size: 13px; color: #cbd5e1; margin-bottom: 16px;">
+        <div style="background: rgba(255,255,255,0.04); padding: 10px; border-radius: 8px;">
+          <strong style="color: #fff;">Navigation:</strong> <br>
+          • <strong>A / D</strong> or <strong>← / →</strong> (Swipe): Move Left / Right <br>
+          • <strong>Space / W / ↑</strong> (Swipe Up): Jump over obstacles & hurdles <br>
+          • <strong>S / ↓</strong> (Swipe Down): Slide under high red laser gates
+        </div>
+        <div style="background: rgba(255,255,255,0.04); padding: 10px; border-radius: 8px;">
+          <strong style="color: #f59e0b;">⏩ Speed Boost Chevron:</strong> <br>
+          Hit golden speed arrows on the road for invulnerable hyper-speed!
+        </div>
+        <div style="background: rgba(255,255,255,0.04); padding: 10px; border-radius: 8px;">
+          <strong style="color: #10b981;">🛡️ Shield & 🧲 Magnet:</strong> <br>
+          Green torus absorbs a crash; cyan torus magnetizes energy orbs.
+        </div>
+      </div>
+      <button id="btn-guide-back" class="menu-btn" style="width: 100%;">GOT IT</button>
+    </div>
+  </div>
+
+  <!-- ==================== SETTINGS MODAL ==================== -->
+  <div id="settings-modal" class="screen-overlay hidden" style="background: rgba(5,7,15,0.88);">
+    <div class="modal-box" style="max-width: 400px;">
+      <div class="modal-title">
+        <span>⚙️ Settings</span>
+        <button id="btn-close-settings" class="icon-btn">✕</button>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="color: #cbd5e1; font-size: 14px; font-weight: 600;">Sound FX</span>
+          <button id="setting-toggle-sound" class="menu-btn" style="padding: 6px 14px; font-size: 13px;">🔊 Enabled</button>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="color: #cbd5e1; font-size: 14px; font-weight: 600;">Synthwave Music</span>
+          <button id="setting-toggle-music" class="menu-btn" style="padding: 6px 14px; font-size: 13px;">🎵 Enabled</button>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="color: #cbd5e1; font-size: 14px; font-weight: 600;">Reset Progress</span>
+          <button id="setting-reset-data" class="menu-btn" style="padding: 6px 14px; font-size: 13px; color: #f87171;">Reset</button>
+        </div>
+      </div>
+
+      <button id="btn-settings-back" class="menu-btn" style="width: 100%;">DONE</button>
+    </div>
+  </div>
+
+  <!-- ==================== IN-GAME HUD ==================== -->
+  <div id="hud-layer" class="hidden">
+    <div class="hud-top">
+      <div class="hud-group">
+        <div class="badge">Distance: <span id="dist-display" class="val-score">0 m</span></div>
+        <div class="badge">Orbs: <span id="coins-display" class="val-coins">0</span></div>
+        <div class="badge">Sector: <span id="sector-display" class="val-sector">1: CYBER HIGHWAY</span></div>
+        <div class="badge" style="padding: 4px 10px;">FPS: <span id="fps-display" class="val-fps">60</span></div>
+      </div>
+
+      <div class="status-bar-container">
+        <div id="status-boost" class="status-item">
+          <span>⏩ BOOST</span>
+          <div class="status-progress"><div id="boost-bar" class="status-fill fill-boost"></div></div>
+        </div>
+        <div id="status-shield" class="status-item">
+          <span>🛡️ SHIELD</span>
+          <div class="status-progress"><div id="shield-bar" class="status-fill fill-shield"></div></div>
+        </div>
+        <div id="status-magnet" class="status-item">
+          <span>🧲 MAGNET</span>
+          <div class="status-progress"><div id="magnet-bar" class="status-fill fill-magnet"></div></div>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <button id="sound-btn" class="icon-btn" title="Toggle Sound">🔊</button>
+        <button id="music-btn" class="icon-btn" title="Toggle Music">🎵</button>
+        <button id="pause-btn" class="icon-btn" title="Pause Game">⏸</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PAUSE SCREEN ==================== -->
+  <div id="pause-screen" class="screen-overlay hidden" style="background: rgba(5,7,15,0.92);">
+    <h1 style="font-size: 38px; color: #fff; margin-bottom: 6px;">MISSION PAUSED</h1>
+    <p style="color: #94a3b8; font-size: 14px; margin-bottom: 20px;">Ready to resume your run?</p>
+    <div class="menu-panel">
+      <button id="btn-resume" class="menu-btn primary">▶ RESUME</button>
+      <button id="btn-restart-from-pause" class="menu-btn">🔄 RESTART</button>
+      <button id="btn-home-from-pause" class="menu-btn">🏠 MAIN MENU</button>
+    </div>
+  </div>
+
+  <!-- ==================== GAME OVER SCREEN ==================== -->
+  <div id="gameover-screen" class="screen-overlay hidden" style="background: rgba(5,7,15,0.94);">
+    <div class="game-tag" style="background: rgba(239, 68, 68, 0.15); border-color: rgba(239, 68, 68, 0.3); color: #f87171;">MISSION TERMINATED</div>
+    <h1 style="font-size: 42px; color: #fff; margin-bottom: 4px;">RUNNER CRASHED</h1>
+
+    <div class="stats-summary">
+      <div class="stat-card">
+        <div class="label">Distance</div>
+        <div id="end-dist" class="value">0 m</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Orbs Secured</div>
+        <div id="end-orbs" class="value">0</div>
+      </div>
+    </div>
+
+    <div class="menu-panel">
+      <button id="btn-retry" class="menu-btn primary">🔄 RETRY RUN</button>
+      <button id="btn-home-from-over" class="menu-btn">🏠 MAIN MENU</button>
+    </div>
+  </div>
+
+  <script>
+    // --- Audible Synthwave Music Engine (Web Audio API) ---
+    class AudioEngine {
+      constructor() {
+        this.ctx = null;
+        this.sfxMuted = false;
+        this.musicMuted = false;
+        this.musicInterval = null;
+        this.musicStep = 0;
+        this.musicMasterGain = null;
+      }
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+          this.musicMasterGain = this.ctx.createGain();
+          this.musicMasterGain.gain.setValueAtTime(0.38, this.ctx.currentTime);
+          this.musicMasterGain.connect(this.ctx.destination);
+        }
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+      startMusic() {
+        this.init();
+        if (this.musicInterval) return;
+
+        const bassFreqs = [110, 110, 130.8, 110, 87.3, 87.3, 98, 98];
+        const melodyFreqs = [220, 261.6, 329.6, 440, 392, 329.6, 261.6, 329.6];
+
+        this.musicInterval = setInterval(() => {
+          if (this.musicMuted || !this.ctx || this.ctx.state !== 'running') return;
+          const now = this.ctx.currentTime;
+          const idx = this.musicStep % 8;
+
+          const oscB = this.ctx.createOscillator();
+          const filterB = this.ctx.createBiquadFilter();
+          const gainB = this.ctx.createGain();
+
+          oscB.type = 'sawtooth';
+          oscB.frequency.setValueAtTime(bassFreqs[idx], now);
+
+          filterB.type = 'lowpass';
+          filterB.frequency.setValueAtTime(600, now);
+          filterB.frequency.exponentialRampToValueAtTime(160, now + 0.12);
+
+          gainB.gain.setValueAtTime(0.45, now);
+          gainB.gain.linearRampToValueAtTime(0.01, now + 0.13);
+
+          oscB.connect(filterB);
+          filterB.connect(gainB);
+          gainB.connect(this.musicMasterGain);
+
+          oscB.start(now);
+          oscB.stop(now + 0.14);
+
+          const oscL = this.ctx.createOscillator();
+          const gainL = this.ctx.createGain();
+          oscL.type = idx % 2 === 0 ? 'triangle' : 'sine';
+          oscL.frequency.setValueAtTime(melodyFreqs[idx], now);
+
+          gainL.gain.setValueAtTime(0.25, now);
+          gainL.gain.exponentialRampToValueAtTime(0.005, now + 0.2);
+
+          oscL.connect(gainL);
+          gainL.connect(this.musicMasterGain);
+
+          oscL.start(now);
+          oscL.stop(now + 0.22);
+
+          if (idx === 2 || idx === 6) {
+            const bufSize = Math.floor(this.ctx.sampleRate * 0.05);
+            const noiseBuf = this.ctx.createBuffer(1, bufSize, this.ctx.sampleRate);
+            const data = noiseBuf.getChannelData(0);
+            for (let i = 0; i < bufSize; i++) data[i] = (Math.random() * 2 - 1) * 0.45;
+
+            const noise = this.ctx.createBufferSource();
+            noise.buffer = noiseBuf;
+            const noiseFilter = this.ctx.createBiquadFilter();
+            noiseFilter.type = 'bandpass';
+            noiseFilter.frequency.setValueAtTime(1400, now);
+
+            const noiseGain = this.ctx.createGain();
+            noiseGain.gain.setValueAtTime(0.28, now);
+            noiseGain.gain.linearRampToValueAtTime(0.01, now + 0.05);
+
+            noise.connect(noiseFilter);
+            noiseFilter.connect(noiseGain);
+            noiseGain.connect(this.musicMasterGain);
+            noise.start(now);
+          }
+
+          this.musicStep++;
+        }, 130);
+      }
+      stopMusic() {
+        if (this.musicInterval) {
+          clearInterval(this.musicInterval);
+          this.musicInterval = null;
+        }
+      }
+      playJump() {
+        if (this.sfxMuted || !this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(160, now);
+        osc.frequency.exponentialRampToValueAtTime(540, now + 0.16);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.16);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.16);
+      }
+      playSlide() {
+        if (this.sfxMuted || !this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(300, now);
+        osc.frequency.exponentialRampToValueAtTime(90, now + 0.2);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.2);
+      }
+      playCoin() {
+        if (this.sfxMuted || !this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(920, now);
+        osc.frequency.setValueAtTime(1420, now + 0.07);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.2);
+      }
+      playBoost() {
+        if (this.sfxMuted || !this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(220, now);
+        osc.frequency.exponentialRampToValueAtTime(880, now + 0.35);
+        gain.gain.setValueAtTime(0.35, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.35);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.35);
+      }
+      playPowerup() {
+        if (this.sfxMuted || !this.ctx) return;
+        const now = this.ctx.currentTime;
+        [440, 554, 659, 880].forEach((freq, idx) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, now + idx * 0.05);
+          gain.gain.setValueAtTime(0.2, now + idx * 0.05);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.05 + 0.25);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now + idx * 0.05);
+          osc.stop(now + idx * 0.05 + 0.25);
+        });
+      }
+      playShieldBreak() {
+        if (this.sfxMuted || !this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(520, now);
+        osc.frequency.exponentialRampToValueAtTime(90, now + 0.3);
+        gain.gain.setValueAtTime(0.35, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.3);
+      }
+      playCrash() {
+        if (this.sfxMuted || !this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(140, now);
+        osc.frequency.exponentialRampToValueAtTime(25, now + 0.35);
+        gain.gain.setValueAtTime(0.45, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.35);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.35);
+      }
+    }
+
+    const audio = new AudioEngine();
+
+    // --- Wardrobe Database: Exactly 5 Items per Category ---
+    const WARDROBE_CATEGORIES = {
+      hat: [
+        { id: 'hat_catears', name: 'Neko Cat Ears', cost: 25, desc: 'Pastel white & pink 3D cat ears' },
+        { id: 'hat_frog', name: 'Froggy Beanie', cost: 40, desc: 'Cute green knit beanie with frog eyes' },
+        { id: 'hat_kasa', name: 'Ronin Straw Hat', cost: 60, desc: 'Conical straw hat with red ribbon knot' },
+        { id: 'hat_tophat', name: 'Formal Top Hat', cost: 80, desc: 'Tall dapper gentleman top hat' },
+        { id: 'hat_halo', name: 'Angel Halo', cost: 100, desc: 'Glowing golden floating angel halo' }
+      ],
+      shirt: [
+        { id: 'shirt_sailor', name: 'Sailor Seifuku', cost: 0, color: 0x38bdf8, desc: 'Blue sailor uniform with white collar & red tie' },
+        { id: 'shirt_hoodie', name: 'Cyber Hoodie', cost: 30, color: 0x0284c7, desc: 'Oversized cozy cyan cyber hoodie with pocket' },
+        { id: 'shirt_yukata', name: 'Summer Yukata', cost: 50, color: 0x8b5cf6, desc: 'Purple festival kimono top with golden obi' },
+        { id: 'shirt_tuxedo', name: 'Dapper Tuxedo', cost: 80, color: 0x0f172a, desc: 'Classic black tuxedo with red bow tie' },
+        { id: 'shirt_cyber', name: 'Neon Idol Vest', cost: 110, color: 0x111827, desc: 'Stage concert vest with glowing neon green trim' }
+      ],
+      pants: [
+        { id: 'pants_skirt', name: 'Pleated Skirt', cost: 0, color: 0x1e3a8a, desc: 'Classic dark navy pleated school skirt' },
+        { id: 'pants_shorts', name: 'Denim Shorts', cost: 25, color: 0x0284c7, desc: 'Light wash denim shorts with knee socks' },
+        { id: 'pants_tech', name: 'Techwear Cargo', cost: 45, color: 0x334155, desc: 'Chunky cyberpunk cargo pants with straps' },
+        { id: 'pants_slacks', name: 'Formal Slacks', cost: 70, color: 0x0f172a, desc: 'Elegant black tailored suit trousers' },
+        { id: 'pants_joggers', name: 'Cyber Joggers', cost: 95, color: 0x0369a1, desc: 'Sporty cyan joggers with white stripe' }
+      ],
+      costume: [
+        { id: 'cost_sailor', name: 'Sailor Idol Set', cost: 50, hat: 'hat_catears', shirt: 'shirt_sailor', pants: 'pants_skirt', desc: 'Full Sailor Uniform + Neko Cat Ears' },
+        { id: 'cost_froggy', name: 'Froggy Casual Set', cost: 80, hat: 'hat_frog', shirt: 'shirt_hoodie', pants: 'pants_shorts', desc: 'Frog Beanie + Cyber Hoodie + Denim Shorts' },
+        { id: 'cost_ronin', name: 'Shadow Ronin Set', cost: 120, hat: 'hat_kasa', shirt: 'shirt_yukata', pants: 'pants_tech', desc: 'Ronin Straw Hat + Summer Yukata + Techwear' },
+        { id: 'cost_gent', name: 'Fancy Mobster Set', cost: 150, hat: 'hat_tophat', shirt: 'shirt_tuxedo', pants: 'pants_slacks', desc: 'Formal Top Hat + Dapper Tuxedo + Slacks' },
+        { id: 'cost_angel', name: 'Tenshi Cyber Set', cost: 190, hat: 'hat_halo', shirt: 'shirt_cyber', pants: 'pants_joggers', desc: 'Angel Halo + Neon Idol Vest + Cyber Joggers' }
+      ],
+      'skin color': [
+        { id: 'skin_peach', name: 'Peach Blossom', cost: 0, color: 0xffedd5, eyeColor: 0x0284c7, blushColor: 0xf472b6, desc: 'Fair peach tone with cyan eyes & rosy blush' },
+        { id: 'skin_caramel', name: 'Golden Caramel', cost: 0, color: 0xfcd34d, eyeColor: 0x9333ea, blushColor: 0xfb7185, desc: 'Warm caramel skin with sparkling violet eyes' },
+        { id: 'skin_snow', name: 'Snow Porcelain', cost: 0, color: 0xf8fafc, eyeColor: 0xec4899, blushColor: 0x38bdf8, desc: 'Alabaster white skin with magenta anime eyes' },
+        { id: 'skin_cyan', name: 'Neon Cyber Cyan', cost: 0, color: 0x67e8f9, eyeColor: 0x0f172a, blushColor: 0x0284c7, desc: 'Vibrant cyber cyan robot skin' },
+        { id: 'skin_lilac', name: 'Shadow Lilac', cost: 0, color: 0xc084fc, eyeColor: 0xfacc15, blushColor: 0xdb2777, desc: 'Alien lilac tone with glowing golden eyes' }
+      ]
+    };
+
+    // --- Missions Directives ---
+    const MISSIONS = [
+      { id: 'm_dist', title: 'Reach Sector 2', desc: 'Cover 600m in a single run', reward: 30, target: 600, key: 'dist' },
+      { id: 'm_orbs', title: 'Orb Collector', desc: 'Gather 40 energy orbs in one run', reward: 25, target: 40, key: 'orbs' },
+      { id: 'm_boost', title: 'Supersonic', desc: 'Activate 1 Speed Boost chevron', reward: 20, target: 1, key: 'boost' },
+      { id: 'm_slide', title: 'Laser Diver', desc: 'Slide under 4 high laser gates', reward: 35, target: 4, key: 'slide' }
+    ];
+
+    // --- Game State & Persistence ---
+    const STATE_HOME = 0, STATE_PLAYING = 1, STATE_PAUSED = 2, STATE_GAMEOVER = 3;
+    let gameState = STATE_HOME;
+
+    let highScore = parseInt(localStorage.getItem('cyber_runner_highscore') || '0', 10);
+    let totalOrbs = parseInt(localStorage.getItem('cyber_runner_total_orbs') || '0', 10);
+    let completedMissions = JSON.parse(localStorage.getItem('cyber_runner_missions') || '[]');
+
+    // Modular Equipped Outfits (Defaults)
+    let equipped = JSON.parse(localStorage.getItem('cyber_runner_equipped_v3') || JSON.stringify({
+      hat: 'hat_catears',
+      shirt: 'shirt_sailor',
+      pants: 'pants_skirt',
+      skin: 'skin_peach'
+    }));
+
+    // Modular Unlocked Items (Free starter items unlocked by default)
+    let unlockedItems = JSON.parse(localStorage.getItem('cyber_runner_unlocked_v3') || JSON.stringify([
+      'shirt_sailor', 'pants_skirt',
+      'skin_peach', 'skin_caramel', 'skin_snow', 'skin_cyan', 'skin_lilac'
+    ]));
+
+    let currentShopCategory = 'hat';
+    let runStats = { dist: 0, orbs: 0, boost: 0, slide: 0 };
+
+    // --- Configuration ---
+    const LANES = [-2.6, 0, 2.6];
+    const TRACK_LENGTH = 180;
+    const INITIAL_SPEED = 24;
+    const MAX_SPEED = 52;
+    const GRAVITY = -42;
+    const JUMP_FORCE = 14;
+
+    let scene, camera, renderer;
+    let player;
+    let playerTorso, playerHead, playerHatGroup, playerEyesGroup, leftArm, rightArm, leftLeg, rightLeg, shieldMesh;
+    let playerTorsoDetail;
+    let playerTargetX = 0, currentLane = 1;
+    let isJumping = false, playerVelocityY = 0;
+    let isSliding = false, slideTimer = 0;
+    const SLIDE_DURATION = 0.65;
+
+    let obstacles = [];
+    let collectibles = [];
+    let powerups = [];
+    let boostPads = [];
+    let cityBuildings = [];
+
+    let currentSector = 1;
+    let speed = INITIAL_SPEED;
+    let score = 0;
+    let collectedCoins = 0;
+    let lastTime = 0;
+    let shakeIntensity = 0;
+
+    let shieldActive = false, shieldDuration = 0;
+    let magnetActive = false, magnetDuration = 0;
+    let boostActive = false, boostDuration = 0;
+
+    // Object Pooling
+    let sharedGeos = {}, sharedMats = {};
+    let thrusterPool = [], thrusterPoolIdx = 0;
+    const THRUSTER_POOL_SIZE = 16;
+    let explosionPool = [], explosionPoolIdx = 0;
+    const EXPLOSION_POOL_SIZE = 35;
+
+    let frameCount = 0, lastFpsUpdate = 0;
+
+    // DOM References
+    const homeScreen = document.getElementById('home-screen');
+    const hudLayer = document.getElementById('hud-layer');
+    const pauseScreen = document.getElementById('pause-screen');
+    const gameoverScreen = document.getElementById('gameover-screen');
+    const guideModal = document.getElementById('guide-modal');
+    const settingsModal = document.getElementById('settings-modal');
+    const hangarModal = document.getElementById('hangar-modal');
+    const missionsModal = document.getElementById('missions-modal');
+
+    const homeHighScore = document.getElementById('home-high-score');
+    const homeTotalOrbs = document.getElementById('home-total-orbs');
+    const shopWalletVal = document.getElementById('shop-wallet-val');
+    const distDisplay = document.getElementById('dist-display');
+    const coinsDisplay = document.getElementById('coins-display');
+    const sectorDisplay = document.getElementById('sector-display');
+    const fpsDisplay = document.getElementById('fps-display');
+    const endDist = document.getElementById('end-dist');
+    const endOrbs = document.getElementById('end-orbs');
+
+    const statusShield = document.getElementById('status-shield');
+    const statusMagnet = document.getElementById('status-magnet');
+    const statusBoost = document.getElementById('status-boost');
+    const shieldBar = document.getElementById('shield-bar');
+    const magnetBar = document.getElementById('magnet-bar');
+    const boostBar = document.getElementById('boost-bar');
+
+    const notificationToast = document.getElementById('notification-toast');
+    let toastTimeout = null;
+
+    function showToast(text) {
+      notificationToast.innerText = text;
+      notificationToast.classList.add('show');
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => notificationToast.classList.remove('show'), 2400);
+    }
+
+    function savePlayerData() {
+      localStorage.setItem('cyber_runner_highscore', highScore);
+      localStorage.setItem('cyber_runner_total_orbs', totalOrbs);
+      localStorage.setItem('cyber_runner_equipped_v3', JSON.stringify(equipped));
+      localStorage.setItem('cyber_runner_unlocked_v3', JSON.stringify(unlockedItems));
+      localStorage.setItem('cyber_runner_missions', JSON.stringify(completedMissions));
+      updateTopBarUI();
+    }
+
+    function updateTopBarUI() {
+      homeHighScore.innerText = `${highScore} m`;
+      homeTotalOrbs.innerText = totalOrbs;
+      if (shopWalletVal) shopWalletVal.innerText = totalOrbs;
+    }
+
+    // --- Three.js Shared Resources ---
+    function initResources() {
+      sharedGeos.block = new THREE.BoxGeometry(1.2, 1.2, 1.2);
+      sharedGeos.beam = new THREE.CylinderGeometry(0.18, 0.18, 2.6, 8);
+      sharedGeos.post = new THREE.BoxGeometry(0.2, 1.6, 0.2);
+      sharedGeos.hurdle = new THREE.BoxGeometry(2.2, 0.4, 0.3);
+      sharedGeos.coin = new THREE.OctahedronGeometry(0.35);
+      sharedGeos.powerup = new THREE.TorusGeometry(0.32, 0.1, 8, 16);
+      sharedGeos.boost = new THREE.BoxGeometry(1.8, 0.05, 1.4);
+      sharedGeos.particle = new THREE.BoxGeometry(0.1, 0.1, 0.1);
+      sharedGeos.flame = new THREE.BoxGeometry(0.08, 0.08, 0.15);
+
+      sharedMats.block = new THREE.MeshLambertMaterial({ color: 0xef4444, emissive: 0x991b1b });
+      sharedMats.beam = new THREE.MeshLambertMaterial({ color: 0xf43f5e, emissive: 0xe11d48 });
+      sharedMats.post = new THREE.MeshLambertMaterial({ color: 0x334155 });
+      sharedMats.hurdle = new THREE.MeshLambertMaterial({ color: 0xf97316, emissive: 0xc2410c });
+      sharedMats.coin = new THREE.MeshLambertMaterial({ color: 0xfacc15, emissive: 0xca8a04 });
+      sharedMats.shieldPowerup = new THREE.MeshLambertMaterial({ color: 0x10b981, emissive: 0x059669 });
+      sharedMats.magnetPowerup = new THREE.MeshLambertMaterial({ color: 0x06b6d4, emissive: 0x0891b2 });
+      sharedMats.boostPad = new THREE.MeshLambertMaterial({ color: 0xf59e0b, emissive: 0xd97706 });
+      sharedMats.drone = new THREE.MeshLambertMaterial({ color: 0xa855f7, emissive: 0x7e22ce });
+
+      sharedMats.particle = new THREE.MeshBasicMaterial({ color: 0xffffff });
+      sharedMats.flameNormal = new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.8 });
+      sharedMats.flameSlide = new THREE.MeshBasicMaterial({ color: 0x06b6d4, transparent: true, opacity: 0.8 });
+    }
+
+    function init() {
+      initResources();
+
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x05070f);
+      scene.fog = new THREE.FogExp2(0x05070f, 0.018);
+
+      camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 300);
+      camera.position.set(0, 3.8, 6.5);
+      camera.lookAt(0, 1.2, -6);
+
+      renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance' });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.25));
+      renderer.setClearColor(0x05070f, 1);
+      renderer.shadowMap.enabled = false;
+      document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+      // Prevent WebGL context loss from turning screen white
+      renderer.domElement.addEventListener('webglcontextlost', (e) => {
+        e.preventDefault();
+      }, false);
+
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
+      scene.add(ambientLight);
+
+      const dirLight = new THREE.DirectionalLight(0x38bdf8, 1.1);
+      dirLight.position.set(10, 20, 10);
+      scene.add(dirLight);
+
+      createTrack();
+      createCityBackground();
+      createCuteAnimeCube();
+      applyAllEquipped();
+      initParticlePools();
+
+      setupUIEvents();
+      setupTouchControls();
+      updateTopBarUI();
+      renderWardrobeShopUI();
+      renderMissionsUI();
+
+      window.addEventListener('keydown', onKeyDown);
+      window.addEventListener('resize', onWindowResize);
+
+      const unlockAudio = () => {
+        audio.init();
+        window.removeEventListener('click', unlockAudio);
+        window.removeEventListener('keydown', unlockAudio);
+      };
+      window.addEventListener('click', unlockAudio);
+      window.addEventListener('keydown', unlockAudio);
+
+      requestAnimationFrame(animate);
+    }
+
+    let trackRails = [];
+    function createTrack() {
+      const trackGeo = new THREE.PlaneGeometry(9.6, TRACK_LENGTH * 2);
+      const trackMat = new THREE.MeshLambertMaterial({ color: 0x0b1120 });
+      const track = new THREE.Mesh(trackGeo, trackMat);
+      track.rotation.x = -Math.PI / 2;
+      track.position.z = -TRACK_LENGTH / 2;
+      scene.add(track);
+
+      for (let x of [-1.3, 1.3]) {
+        const lineGeo = new THREE.PlaneGeometry(0.08, TRACK_LENGTH * 2);
+        const lineMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.35 });
+        const line = new THREE.Mesh(lineGeo, lineMat);
+        line.rotation.x = -Math.PI / 2;
+        line.position.set(x, 0.01, -TRACK_LENGTH / 2);
+        scene.add(line);
+      }
+
+      for (let x of [-4.8, 4.8]) {
+        const railGeo = new THREE.BoxGeometry(0.3, 0.4, TRACK_LENGTH * 2);
+        const railMat = new THREE.MeshLambertMaterial({ color: 0x0284c7, emissive: 0x0284c7 });
+        const rail = new THREE.Mesh(railGeo, railMat);
+        rail.position.set(x, 0.2, -TRACK_LENGTH / 2);
+        scene.add(rail);
+        trackRails.push(rail);
+      }
+    }
+
+    function createCityBackground() {
+      const buildingMat = new THREE.MeshLambertMaterial({ color: 0x0d1527 });
+      for (let i = 0; i < 20; i++) {
+        const height = 18 + Math.random() * 40;
+        const width = 7 + Math.random() * 8;
+        const depth = 7 + Math.random() * 8;
+        const geo = new THREE.BoxGeometry(width, height, depth);
+        const building = new THREE.Mesh(geo, buildingMat);
+
+        const side = i % 2 === 0 ? -1 : 1;
+        const x = side * (13 + Math.random() * 20);
+        const z = -Math.random() * TRACK_LENGTH * 1.5;
+        building.position.set(x, height / 2 - 2, z);
+
+        scene.add(building);
+        cityBuildings.push(building);
+      }
+    }
+
+    // --- Build Cute Chibi Anime Cube Character ---
+    function createCuteAnimeCube() {
+      player = new THREE.Group();
+
+      // 1. Torso / Shirt
+      const torsoGeo = new THREE.BoxGeometry(0.62, 0.58, 0.42);
+      const torsoMat = new THREE.MeshLambertMaterial({ color: 0x38bdf8 });
+      playerTorso = new THREE.Mesh(torsoGeo, torsoMat);
+      playerTorso.position.y = 0.62;
+      player.add(playerTorso);
+
+      playerTorsoDetail = new THREE.Group();
+      playerTorso.add(playerTorsoDetail);
+
+      // 2. Chibi Head (Cute Proportions)
+      const headGeo = new THREE.BoxGeometry(0.64, 0.56, 0.58);
+      const headMat = new THREE.MeshLambertMaterial({ color: 0xffedd5 });
+      playerHead = new THREE.Mesh(headGeo, headMat);
+      playerHead.position.set(0, 0.58, 0);
+      playerTorso.add(playerHead);
+
+      // 3. Cute Anime Face Group (Big Eyes + Rosy Blush)
+      playerEyesGroup = new THREE.Group();
+      playerHead.add(playerEyesGroup);
+
+      // 4. Dynamic Hat Group on Head
+      playerHatGroup = new THREE.Group();
+      playerHatGroup.position.set(0, 0.28, 0);
+      playerHead.add(playerHatGroup);
+
+      // 5. Cute Arms
+      const armGeo = new THREE.BoxGeometry(0.16, 0.48, 0.18);
+      const armMat = new THREE.MeshLambertMaterial({ color: 0x38bdf8 });
+
+      leftArm = new THREE.Mesh(armGeo, armMat);
+      leftArm.position.set(-0.41, 0.02, 0);
+      playerTorso.add(leftArm);
+
+      rightArm = new THREE.Mesh(armGeo, armMat);
+      rightArm.position.set(0.41, 0.02, 0);
+      playerTorso.add(rightArm);
+
+      // 6. Cute Stubby Legs / Pants
+      const legGeo = new THREE.BoxGeometry(0.22, 0.42, 0.24);
+      const legMat = new THREE.MeshLambertMaterial({ color: 0x1e3a8a });
+
+      leftLeg = new THREE.Mesh(legGeo, legMat);
+      leftLeg.position.set(-0.16, -0.42, 0);
+      playerTorso.add(leftLeg);
+
+      rightLeg = new THREE.Mesh(legGeo, legMat);
+      rightLeg.position.set(0.16, -0.42, 0);
+      playerTorso.add(rightLeg);
+
+      // Shield Bubble
+      const shieldGeo = new THREE.SphereGeometry(1.2, 12, 12);
+      const shieldMat = new THREE.MeshBasicMaterial({
+        color: 0x10b981,
+        transparent: true,
+        opacity: 0.4,
+        wireframe: true
+      });
+      shieldMesh = new THREE.Mesh(shieldGeo, shieldMat);
+      shieldMesh.position.y = 0.65;
+      shieldMesh.visible = false;
+      player.add(shieldMesh);
+
+      player.position.set(0, 0, 0);
+      scene.add(player);
+    }
+
+    // --- Face Builder ---
+    function buildAnimeFace(skinItem) {
+      while (playerEyesGroup.children.length > 0) {
+        playerEyesGroup.remove(playerEyesGroup.children[0]);
+      }
+
+      playerHead.material.color.setHex(skinItem.color);
+
+      for (let side of [-0.17, 0.17]) {
+        // Eye background
+        const eyeGeo = new THREE.BoxGeometry(0.13, 0.18, 0.04);
+        const eyeMat = new THREE.MeshBasicMaterial({ color: skinItem.eyeColor });
+        const eye = new THREE.Mesh(eyeGeo, eyeMat);
+        eye.position.set(side, 0.04, -0.3);
+        playerEyesGroup.add(eye);
+
+        // White reflection highlight
+        const sparkGeo = new THREE.BoxGeometry(0.05, 0.06, 0.05);
+        const sparkMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        const spark = new THREE.Mesh(sparkGeo, sparkMat);
+        spark.position.set(side - 0.02, 0.08, -0.31);
+        playerEyesGroup.add(spark);
+
+        // Rosy blush on cheeks
+        const blushGeo = new THREE.BoxGeometry(0.12, 0.05, 0.03);
+        const blushMat = new THREE.MeshBasicMaterial({ color: skinItem.blushColor });
+        const blush = new THREE.Mesh(blushGeo, blushMat);
+        blush.position.set(side * 1.3, -0.09, -0.3);
+        playerEyesGroup.add(blush);
+      }
+    }
+
+    // --- Hat Builder ---
+    function buildHatModel(hatId, targetGroup) {
+      while (targetGroup.children.length > 0) {
+        targetGroup.remove(targetGroup.children[0]);
+      }
+
+      if (hatId === 'hat_catears') {
+        const earMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+        const innerMat = new THREE.MeshLambertMaterial({ color: 0xf472b6 });
+        for (let side of [-0.22, 0.22]) {
+          const earGeo = new THREE.ConeGeometry(0.14, 0.3, 4);
+          const ear = new THREE.Mesh(earGeo, earMat);
+          ear.position.set(side, 0.12, 0);
+          ear.rotation.y = Math.PI / 4;
+          ear.rotation.z = side > 0 ? -0.2 : 0.2;
+          targetGroup.add(ear);
+
+          const inGeo = new THREE.BoxGeometry(0.08, 0.14, 0.04);
+          const inMesh = new THREE.Mesh(inGeo, innerMat);
+          inMesh.position.set(side, 0.1, -0.06);
+          targetGroup.add(inMesh);
+        }
+      } else if (hatId === 'hat_frog') {
+        const greenMat = new THREE.MeshLambertMaterial({ color: 0x4ade80 });
+        const capGeo = new THREE.BoxGeometry(0.68, 0.18, 0.62);
+        const cap = new THREE.Mesh(capGeo, greenMat);
+        cap.position.y = 0.02;
+        targetGroup.add(cap);
+
+        for (let side of [-0.2, 0.2]) {
+          const eyeGeo = new THREE.SphereGeometry(0.1, 10, 10);
+          const eye = new THREE.Mesh(eyeGeo, greenMat);
+          eye.position.set(side, 0.18, -0.08);
+          targetGroup.add(eye);
+
+          const pupilGeo = new THREE.BoxGeometry(0.06, 0.06, 0.06);
+          const pupil = new THREE.Mesh(pupilGeo, new THREE.MeshBasicMaterial({ color: 0x000000 }));
+          pupil.position.set(side, 0.18, -0.16);
+          targetGroup.add(pupil);
+        }
+      } else if (hatId === 'hat_kasa') {
+        const strawMat = new THREE.MeshLambertMaterial({ color: 0x78350f });
+        const kasaGeo = new THREE.ConeGeometry(0.72, 0.22, 16);
+        const kasa = new THREE.Mesh(kasaGeo, strawMat);
+        kasa.position.y = 0.12;
+        targetGroup.add(kasa);
+
+        const bandMat = new THREE.MeshBasicMaterial({ color: 0xef4444 });
+        const bandGeo = new THREE.BoxGeometry(0.12, 0.04, 0.35);
+        const band = new THREE.Mesh(bandGeo, bandMat);
+        band.position.set(0, 0.08, 0.32);
+        targetGroup.add(band);
+      } else if (hatId === 'hat_tophat') {
+        const topMat = new THREE.MeshLambertMaterial({ color: 0x09090b });
+        const chimneyGeo = new THREE.CylinderGeometry(0.28, 0.28, 0.45, 16);
+        const chimney = new THREE.Mesh(chimneyGeo, topMat);
+        chimney.position.y = 0.24;
+        targetGroup.add(chimney);
+
+        const ribMat = new THREE.MeshBasicMaterial({ color: 0xdc2626 });
+        const ribGeo = new THREE.CylinderGeometry(0.29, 0.29, 0.08, 16);
+        const rib = new THREE.Mesh(ribGeo, ribMat);
+        rib.position.y = 0.08;
+        targetGroup.add(rib);
+
+        const brimGeo = new THREE.CylinderGeometry(0.48, 0.48, 0.04, 16);
+        const brim = new THREE.Mesh(brimGeo, topMat);
+        brim.position.y = 0.02;
+        targetGroup.add(brim);
+      } else if (hatId === 'hat_halo') {
+        const haloMat = new THREE.MeshLambertMaterial({ color: 0xfef08a, emissive: 0xfacc15 });
+        const haloGeo = new THREE.TorusGeometry(0.36, 0.04, 8, 20);
+        const halo = new THREE.Mesh(haloGeo, haloMat);
+        halo.rotation.x = Math.PI / 2;
+        halo.position.set(0, 0.4, 0);
+        targetGroup.add(halo);
+      }
+    }
+
+    // --- Shirt Builder ---
+    function buildShirtModel(shirtItem) {
+      playerTorso.material.color.setHex(shirtItem.color);
+      leftArm.material.color.setHex(shirtItem.color);
+      rightArm.material.color.setHex(shirtItem.color);
+
+      while (playerTorsoDetail.children.length > 0) {
+        playerTorsoDetail.remove(playerTorsoDetail.children[0]);
+      }
+
+      if (shirtItem.id === 'shirt_sailor') {
+        const collarMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+        const flapGeo = new THREE.BoxGeometry(0.46, 0.18, 0.44);
+        const flap = new THREE.Mesh(flapGeo, collarMat);
+        flap.position.set(0, 0.22, 0);
+        playerTorsoDetail.add(flap);
+
+        const tieMat = new THREE.MeshBasicMaterial({ color: 0xef4444 });
+        const tieGeo = new THREE.BoxGeometry(0.1, 0.22, 0.05);
+        const tie = new THREE.Mesh(tieGeo, tieMat);
+        tie.position.set(0, 0.08, -0.23);
+        playerTorsoDetail.add(tie);
+      } else if (shirtItem.id === 'shirt_hoodie') {
+        const pouchMat = new THREE.MeshLambertMaterial({ color: 0x0284c7 });
+        const pouchGeo = new THREE.BoxGeometry(0.38, 0.2, 0.06);
+        const pouch = new THREE.Mesh(pouchGeo, pouchMat);
+        pouch.position.set(0, -0.1, -0.22);
+        playerTorsoDetail.add(pouch);
+      } else if (shirtItem.id === 'shirt_yukata') {
+        const obiMat = new THREE.MeshLambertMaterial({ color: 0xfacc15, emissive: 0xd97706 });
+        const obiGeo = new THREE.BoxGeometry(0.66, 0.15, 0.45);
+        const obi = new THREE.Mesh(obiGeo, obiMat);
+        obi.position.set(0, -0.12, 0);
+        playerTorsoDetail.add(obi);
+      } else if (shirtItem.id === 'shirt_tuxedo') {
+        const shirtMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+        const frontGeo = new THREE.BoxGeometry(0.24, 0.5, 0.44);
+        const front = new THREE.Mesh(frontGeo, shirtMat);
+        playerTorsoDetail.add(front);
+
+        const tieMat = new THREE.MeshBasicMaterial({ color: 0xdc2626 });
+        const tieGeo = new THREE.BoxGeometry(0.12, 0.06, 0.46);
+        const tie = new THREE.Mesh(tieGeo, tieMat);
+        tie.position.set(0, 0.15, 0);
+        playerTorsoDetail.add(tie);
+      } else if (shirtItem.id === 'shirt_cyber') {
+        const neonMat = new THREE.MeshBasicMaterial({ color: 0x22c55e });
+        const lineGeo = new THREE.BoxGeometry(0.08, 0.45, 0.44);
+        const line = new THREE.Mesh(lineGeo, neonMat);
+        line.position.set(0, 0, 0);
+        playerTorsoDetail.add(line);
+      }
+    }
+
+    // --- Pants Builder ---
+    function buildPantsModel(pantsItem) {
+      leftLeg.material.color.setHex(pantsItem.color);
+      rightLeg.material.color.setHex(pantsItem.color);
+    }
+
+    function applyAllEquipped() {
+      const skinItem = WARDROBE_CATEGORIES['skin color'].find(s => s.id === equipped.skin) || WARDROBE_CATEGORIES['skin color'][0];
+      const shirtItem = WARDROBE_CATEGORIES['shirt'].find(s => s.id === equipped.shirt) || WARDROBE_CATEGORIES['shirt'][0];
+      const pantsItem = WARDROBE_CATEGORIES['pants'].find(p => p.id === equipped.pants) || WARDROBE_CATEGORIES['pants'][0];
+
+      buildAnimeFace(skinItem);
+      buildHatModel(equipped.hat, playerHatGroup);
+      buildShirtModel(shirtItem);
+      buildPantsModel(pantsItem);
+    }
+
+    // --- Particle Pooling ---
+    function initParticlePools() {
+      for (let i = 0; i < THRUSTER_POOL_SIZE; i++) {
+        const flame = new THREE.Mesh(sharedGeos.flame, sharedMats.flameNormal);
+        flame.visible = false;
+        flame.life = 0;
+        scene.add(flame);
+        thrusterPool.push(flame);
+      }
+
+      for (let i = 0; i < EXPLOSION_POOL_SIZE; i++) {
+        const mat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        const part = new THREE.Mesh(sharedGeos.particle, mat);
+        part.visible = false;
+        part.vel = new THREE.Vector3();
+        part.life = 0;
+        scene.add(part);
+        explosionPool.push(part);
+      }
+    }
+
+    function emitFootsteps() {
+      const flame = thrusterPool[thrusterPoolIdx];
+      thrusterPoolIdx = (thrusterPoolIdx + 1) % THRUSTER_POOL_SIZE;
+
+      flame.material = boostActive ? sharedMats.coin : (isSliding ? sharedMats.flameSlide : sharedMats.flameNormal);
+      const worldPos = new THREE.Vector3(0, 0.1, 0.3).applyMatrix4(player.matrixWorld);
+      flame.position.copy(worldPos);
+      flame.scale.set(1, 1, 1);
+      flame.life = 0.2;
+      flame.visible = true;
+    }
+
+    function triggerExplosion(pos, colorHex, count = 18) {
+      for (let i = 0; i < count; i++) {
+        const p = explosionPool[explosionPoolIdx];
+        explosionPoolIdx = (explosionPoolIdx + 1) % EXPLOSION_POOL_SIZE;
+
+        p.material.color.setHex(colorHex);
+        p.position.copy(pos);
+        p.scale.set(1, 1, 1);
+        p.vel.set((Math.random() - 0.5) * 8, Math.random() * 6 + 2, (Math.random() - 0.5) * 8);
+        p.life = 0.4;
+        p.visible = true;
+      }
+    }
+
+    // --- Dynamic Biome Zones ---
+    function updateSectorTheme(dist) {
+      let targetSector = 1;
+      if (dist >= 1400) targetSector = 3;
+      else if (dist >= 600) targetSector = 2;
+
+      if (targetSector !== currentSector) {
+        currentSector = targetSector;
+        if (currentSector === 2) {
+          scene.background.setHex(0x15051a);
+          scene.fog.color.setHex(0x15051a);
+          trackRails.forEach(r => { r.material.color.setHex(0xd946ef); r.material.emissive.setHex(0xd946ef); });
+          sectorDisplay.innerText = "2: NEON DUSK";
+          sectorDisplay.style.color = "#ec4899";
+          showToast("🌆 ENTERING SECTOR 2: NEON DUSK!");
+          checkMission('dist', 600);
+        } else if (currentSector === 3) {
+          scene.background.setHex(0x031209);
+          scene.fog.color.setHex(0x031209);
+          trackRails.forEach(r => { r.material.color.setHex(0x10b981); r.material.emissive.setHex(0x10b981); });
+          sectorDisplay.innerText = "3: ACID MATRIX GRID";
+          sectorDisplay.style.color = "#10b981";
+          showToast("⚡ ENTERING SECTOR 3: ACID MATRIX GRID!");
+        }
+      }
+    }
+
+    // --- Spawner Logic ---
+    function spawnWave(zPos) {
+      const typeRoll = Math.random();
+      const laneIdx = Math.floor(Math.random() * 3);
+      const x = LANES[laneIdx];
+
+      if (Math.random() < 0.14) {
+        const boost = new THREE.Mesh(sharedGeos.boost, sharedMats.boostPad);
+        boost.position.set(x, 0.03, zPos);
+        scene.add(boost);
+        boostPads.push(boost);
+      }
+
+      if (typeRoll < 0.35) {
+        const obs = new THREE.Mesh(sharedGeos.block, sharedMats.block);
+        obs.position.set(x, 0.6, zPos);
+        obs.obstacleType = 'block';
+        scene.add(obs);
+        obstacles.push(obs);
+      } else if (typeRoll < 0.6) {
+        const group = new THREE.Group();
+        const beam = new THREE.Mesh(sharedGeos.beam, sharedMats.beam);
+        beam.rotation.z = Math.PI / 2;
+        beam.position.y = 1.35;
+        group.add(beam);
+
+        for (let postX of [-1.3, 1.3]) {
+          const post = new THREE.Mesh(sharedGeos.post, sharedMats.post);
+          post.position.set(postX, 0.8, 0);
+          group.add(post);
+        }
+
+        group.position.set(x, 0, zPos);
+        group.obstacleType = 'high_barrier';
+        scene.add(group);
+        obstacles.push(group);
+      } else if (typeRoll < 0.85) {
+        const group = new THREE.Group();
+        const bar = new THREE.Mesh(sharedGeos.hurdle, sharedMats.hurdle);
+        bar.position.y = 0.25;
+        group.add(bar);
+
+        group.position.set(x, 0, zPos);
+        group.obstacleType = 'low_hurdle';
+        scene.add(group);
+        obstacles.push(group);
+
+        for (let a = -1.5; a <= 1.5; a += 1.0) {
+          const arcCoin = new THREE.Mesh(sharedGeos.coin, sharedMats.coin);
+          const arcY = 0.8 + (1 - (a / 1.5) ** 2) * 1.5;
+          arcCoin.position.set(x, arcY, zPos + a * 2.5);
+          scene.add(arcCoin);
+          collectibles.push(arcCoin);
+        }
+      } else {
+        const drone = new THREE.Mesh(sharedGeos.block, sharedMats.drone);
+        drone.position.set(x, 0.6, zPos);
+        drone.obstacleType = 'drone';
+        drone.moveDir = Math.random() > 0.5 ? 1 : -1;
+        scene.add(drone);
+        obstacles.push(drone);
+      }
+
+      const freeLanes = [0, 1, 2].filter(l => l !== laneIdx);
+      const chosenLane = LANES[freeLanes[Math.floor(Math.random() * freeLanes.length)]];
+      const itemRoll = Math.random();
+
+      if (itemRoll < 0.08) {
+        spawnPowerup(chosenLane, zPos, 'shield');
+      } else if (itemRoll < 0.16) {
+        spawnPowerup(chosenLane, zPos, 'magnet');
+      } else if (typeRoll < 0.6) {
+        spawnCoin(chosenLane, zPos);
+      }
+    }
+
+    function spawnCoin(x, z) {
+      const coin = new THREE.Mesh(sharedGeos.coin, sharedMats.coin);
+      coin.position.set(x, 0.7, z);
+      scene.add(coin);
+      collectibles.push(coin);
+    }
+
+    function spawnPowerup(x, z, type) {
+      const mesh = new THREE.Mesh(
+        sharedGeos.powerup,
+        type === 'shield' ? sharedMats.shieldPowerup : sharedMats.magnetPowerup
+      );
+      mesh.position.set(x, 0.8, z);
+      mesh.powerupType = type;
+      scene.add(mesh);
+      powerups.push(mesh);
+    }
+
+    // --- State Transitions ---
+    function showHomeScreen() {
+      gameState = STATE_HOME;
+      homeScreen.classList.remove('hidden');
+      hudLayer.classList.add('hidden');
+      pauseScreen.classList.add('hidden');
+      gameoverScreen.classList.add('hidden');
+      guideModal.classList.add('hidden');
+      settingsModal.classList.add('hidden');
+      hangarModal.classList.add('hidden');
+      missionsModal.classList.add('hidden');
+
+      audio.stopMusic();
+      cleanupEntities();
+
+      currentLane = 1;
+      playerTargetX = LANES[currentLane];
+      player.position.set(0, 0, 0);
+      endSlide();
+
+      // Ensure background stays deep cyber blue
+      scene.background.setHex(0x05070f);
+      scene.fog.color.setHex(0x05070f);
+      trackRails.forEach(r => { r.material.color.setHex(0x0284c7); r.material.emissive.setHex(0x0284c7); });
+
+      updateTopBarUI();
+    }
+
+    function startRun() {
+      audio.init();
+      audio.startMusic();
+      cleanupEntities();
+
+      currentLane = 1;
+      playerTargetX = LANES[currentLane];
+      player.position.set(0, 0, 0);
+      playerVelocityY = 0;
+      isJumping = false;
+      endSlide();
+
+      // Ensure character faces strictly straight forward with zero rotation
+      player.rotation.set(0, 0, 0);
+      playerTorso.rotation.set(0, 0, 0);
+      playerHead.rotation.set(0, 0, 0);
+
+      speed = INITIAL_SPEED;
+      score = 0;
+      collectedCoins = 0;
+      currentSector = 1;
+      runStats = { dist: 0, orbs: 0, boost: 0, slide: 0 };
+
+      sectorDisplay.innerText = "1: CYBER HIGHWAY";
+      sectorDisplay.style.color = "#38bdf8";
+      scene.background.setHex(0x05070f);
+      scene.fog.color.setHex(0x05070f);
+      trackRails.forEach(r => { r.material.color.setHex(0x0284c7); r.material.emissive.setHex(0x0284c7); });
+
+      shieldActive = false;
+      magnetActive = false;
+      boostActive = false;
+      shieldMesh.visible = false;
+      statusShield.style.display = 'none';
+      statusMagnet.style.display = 'none';
+      statusBoost.style.display = 'none';
+
+      for (let z = -25; z > -TRACK_LENGTH; z -= 16) {
+        spawnWave(z);
+      }
+
+      gameState = STATE_PLAYING;
+      homeScreen.classList.add('hidden');
+      pauseScreen.classList.add('hidden');
+      gameoverScreen.classList.add('hidden');
+      hudLayer.classList.remove('hidden');
+      coinsDisplay.innerText = '0';
+    }
+
+    function cleanupEntities() {
+      obstacles.forEach(o => scene.remove(o));
+      collectibles.forEach(c => scene.remove(c));
+      powerups.forEach(p => scene.remove(p));
+      boostPads.forEach(b => scene.remove(b));
+      obstacles = [];
+      collectibles = [];
+      powerups = [];
+      boostPads = [];
+
+      thrusterPool.forEach(p => { p.visible = false; p.life = 0; });
+      explosionPool.forEach(p => { p.visible = false; p.life = 0; });
+    }
+
+    function togglePause() {
+      if (gameState === STATE_PLAYING) {
+        gameState = STATE_PAUSED;
+        pauseScreen.classList.remove('hidden');
+      } else if (gameState === STATE_PAUSED) {
+        gameState = STATE_PLAYING;
+        pauseScreen.classList.add('hidden');
+      }
+    }
+
+    function handleGameOver() {
+      gameState = STATE_GAMEOVER;
+      shakeIntensity = 0.55;
+      audio.playCrash();
+      triggerExplosion(player.position, 0xef4444, 30);
+
+      const finalScore = Math.floor(score);
+      if (finalScore > highScore) {
+        highScore = finalScore;
+      }
+      totalOrbs += collectedCoins;
+      savePlayerData();
+
+      endDist.innerText = `${finalScore} m`;
+      endOrbs.innerText = collectedCoins;
+
+      hudLayer.classList.add('hidden');
+      gameoverScreen.classList.remove('hidden');
+    }
+
+    function checkMission(key, value) {
+      MISSIONS.forEach(m => {
+        if (m.key === key && value >= m.target && !completedMissions.includes(m.id)) {
+          completedMissions.push(m.id);
+          totalOrbs += m.reward;
+          savePlayerData();
+          showToast(`🎯 MISSION COMPLETE: ${m.title} (+${m.reward} Orbs)!`);
+          renderMissionsUI();
+          renderWardrobeShopUI();
+        }
+      });
+    }
+
+    // --- Singleton 3D Preview Engine (Uses ONLY 1 WebGL Context for all previews) ---
+    class PreviewEngine {
+      constructor() {
+        this.offscreen = document.createElement('canvas');
+        this.offscreen.width = 160;
+        this.offscreen.height = 90;
+
+        this.renderer = new THREE.WebGLRenderer({ canvas: this.offscreen, alpha: true, antialias: false });
+        this.renderer.setSize(160, 90);
+        this.renderer.setPixelRatio(1);
+        this.renderer.setClearColor(0x000000, 0);
+
+        this.scene = new THREE.Scene();
+        this.camera = new THREE.PerspectiveCamera(40, 160 / 90, 0.1, 20);
+        this.camera.position.set(0, 0, 2.2);
+        this.camera.lookAt(0, 0, 0);
+
+        const amb = new THREE.AmbientLight(0xffffff, 0.95);
+        this.scene.add(amb);
+        const dir = new THREE.DirectionalLight(0x38bdf8, 1.2);
+        dir.position.set(2, 4, 3);
+        this.scene.add(dir);
+
+        this.items = []; // { ctx2d, group, canvas }
+      }
+
+      clear() {
+        while (this.scene.children.length > 2) {
+          this.scene.remove(this.scene.children[2]);
+        }
+        this.items = [];
+      }
+
+      registerItem(canvas, item, category) {
+        const ctx2d = canvas.getContext('2d');
+        const previewGroup = new THREE.Group();
+        this.scene.add(previewGroup);
+
+        if (category === 'hat') {
+          const dummyHat = new THREE.Group();
+          buildHatModel(item.id, dummyHat);
+          dummyHat.position.set(0, -0.15, 0);
+          previewGroup.add(dummyHat);
+        } else if (category === 'shirt') {
+          const tGeo = new THREE.BoxGeometry(0.55, 0.5, 0.35);
+          const tMat = new THREE.MeshLambertMaterial({ color: item.color });
+          const torso = new THREE.Mesh(tGeo, tMat);
+          previewGroup.add(torso);
+        } else if (category === 'pants') {
+          const pGeo = new THREE.BoxGeometry(0.48, 0.45, 0.35);
+          const pMat = new THREE.MeshLambertMaterial({ color: item.color });
+          const pants = new THREE.Mesh(pGeo, pMat);
+          previewGroup.add(pants);
+        } else if (category === 'costume') {
+          const chibi = new THREE.Group();
+          const head = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.36, 0.36), new THREE.MeshLambertMaterial({ color: 0xffedd5 }));
+          head.position.y = 0.35;
+          chibi.add(head);
+
+          const shirtItem = WARDROBE_CATEGORIES.shirt.find(s => s.id === item.shirt);
+          const torso = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.34, 0.28), new THREE.MeshLambertMaterial({ color: shirtItem ? shirtItem.color : 0x0284c7 }));
+          torso.position.y = 0;
+          chibi.add(torso);
+
+          const pantsItem = WARDROBE_CATEGORIES.pants.find(p => p.id === item.pants);
+          const pants = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.28, 0.24), new THREE.MeshLambertMaterial({ color: pantsItem ? pantsItem.color : 0x1e3a8a }));
+          pants.position.y = -0.3;
+          chibi.add(pants);
+
+          const hatG = new THREE.Group();
+          hatG.position.y = 0.18;
+          hatG.scale.set(0.65, 0.65, 0.65);
+          buildHatModel(item.hat, hatG);
+          head.add(hatG);
+
+          chibi.scale.set(0.9, 0.9, 0.9);
+          previewGroup.add(chibi);
+        } else if (category === 'skin color') {
+          const head = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.54, 0.54), new THREE.MeshLambertMaterial({ color: item.color }));
+          for (let side of [-0.15, 0.15]) {
+            const eye = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.16, 0.04), new THREE.MeshBasicMaterial({ color: item.eyeColor }));
+            eye.position.set(side, 0.04, -0.28);
+            head.add(eye);
+            const blush = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.04, 0.03), new THREE.MeshBasicMaterial({ color: item.blushColor }));
+            blush.position.set(side * 1.3, -0.08, -0.28);
+            head.add(blush);
+          }
+          previewGroup.add(head);
+        }
+
+        previewGroup.visible = false;
+        this.items.push({ canvas: canvas, ctx2d: ctx2d, group: previewGroup });
+      }
+
+      renderAll() {
+        if (this.items.length === 0) return;
+        this.items.forEach(it => {
+          this.items.forEach(other => other.group.visible = false);
+          it.group.visible = true;
+          it.group.rotation.y += 0.03;
+
+          this.renderer.render(this.scene, this.camera);
+          it.ctx2d.clearRect(0, 0, it.canvas.width, it.canvas.height);
+          it.ctx2d.drawImage(this.offscreen, 0, 0);
+        });
+      }
+    }
+
+    let previewEngine = null;
+
+    // --- Render Wardrobe with 5 Clear Items & Rotating 3D Models ---
+    function renderWardrobeShopUI() {
+      const container = document.getElementById('wardrobe-items-container');
+      container.innerHTML = '';
+      if (shopWalletVal) shopWalletVal.innerText = totalOrbs;
+
+      if (!previewEngine) {
+        previewEngine = new PreviewEngine();
+      }
+      previewEngine.clear();
+
+      const items = WARDROBE_CATEGORIES[currentShopCategory] || [];
+
+      items.forEach((item, index) => {
+        let isEquipped = false;
+        let isUnlocked = false;
+
+        if (currentShopCategory === 'costume') {
+          isEquipped = equipped.hat === item.hat && equipped.shirt === item.shirt && equipped.pants === item.pants;
+          isUnlocked = unlockedItems.includes(item.id);
+        } else if (currentShopCategory === 'skin color') {
+          isEquipped = equipped.skin === item.id;
+          isUnlocked = true;
+        } else {
+          isEquipped = equipped[currentShopCategory] === item.id;
+          isUnlocked = unlockedItems.includes(item.id);
+        }
+
+        const canAfford = totalOrbs >= item.cost;
+        const missingOrbs = item.cost - totalOrbs;
+
+        const card = document.createElement('div');
+        card.className = `skin-card ${isEquipped ? 'selected' : ''}`;
+
+        let btnHtml = '';
+        if (isEquipped) {
+          btnHtml = `<button class="skin-btn equipped">✓ WEARING</button>`;
+        } else if (isUnlocked || item.cost === 0) {
+          btnHtml = `<button class="skin-btn equip">WEAR</button>`;
+        } else if (canAfford) {
+          btnHtml = `<button class="skin-btn buy">BUY (${item.cost} 💰)</button>`;
+        } else {
+          btnHtml = `<button class="skin-btn locked">NEED ${missingOrbs} MORE 💰</button>`;
+        }
+
+        const canvasId = `mini-canvas-${index}`;
+        card.innerHTML = `
+          <div class="item-header">
+            <strong style="color: #fff; font-size: 13px;">${item.name}</strong>
+            <span style="font-size: 11px; font-weight: 800; color: ${canAfford || isUnlocked ? '#facc15' : '#94a3b8'};">
+              ${item.cost === 0 ? 'FREE' : item.cost + ' 💰'}
+            </span>
+          </div>
+          <div class="item-canvas-box">
+            <canvas id="${canvasId}" width="160" height="90"></canvas>
+          </div>
+          <div class="item-info">
+            <span>${item.desc}</span>
+          </div>
+          ${btnHtml}
+        `;
+        container.appendChild(card);
+
+        // Register 2D canvas with the single offscreen preview engine
+        const canvas = card.querySelector(`#${canvasId}`);
+        previewEngine.registerItem(canvas, item, currentShopCategory);
+
+        // Preview full character in center stage on hover
+        card.addEventListener('mouseenter', () => {
+          if (currentShopCategory === 'hat') buildHatModel(item.id, playerHatGroup);
+          else if (currentShopCategory === 'shirt') buildShirtModel(item);
+          else if (currentShopCategory === 'pants') buildPantsModel(item);
+          else if (currentShopCategory === 'skin color') buildAnimeFace(item);
+          else if (currentShopCategory === 'costume') {
+            const h = item.hat;
+            const s = WARDROBE_CATEGORIES.shirt.find(sh => sh.id === item.shirt);
+            const p = WARDROBE_CATEGORIES.pants.find(pa => pa.id === item.pants);
+            buildHatModel(h, playerHatGroup);
+            if (s) buildShirtModel(s);
+            if (p) buildPantsModel(p);
+          }
+        });
+
+        const btn = card.querySelector('.skin-btn.equip, .skin-btn.buy');
+        if (btn) {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (isUnlocked || item.cost === 0) {
+              if (currentShopCategory === 'costume') {
+                equipped.hat = item.hat;
+                equipped.shirt = item.shirt;
+                equipped.pants = item.pants;
+              } else if (currentShopCategory === 'skin color') {
+                equipped.skin = item.id;
+              } else {
+                equipped[currentShopCategory] = item.id;
+              }
+              applyAllEquipped();
+              savePlayerData();
+              renderWardrobeShopUI();
+              showToast(`✨ EQUIPPED ${item.name}!`);
+            } else if (canAfford) {
+              totalOrbs -= item.cost;
+              unlockedItems.push(item.id);
+              if (currentShopCategory === 'costume') {
+                unlockedItems.push(item.hat, item.shirt, item.pants);
+                equipped.hat = item.hat;
+                equipped.shirt = item.shirt;
+                equipped.pants = item.pants;
+              } else if (currentShopCategory === 'skin color') {
+                equipped.skin = item.id;
+              } else {
+                equipped[currentShopCategory] = item.id;
+              }
+              applyAllEquipped();
+              savePlayerData();
+              renderWardrobeShopUI();
+              showToast(`🎉 UNLOCKED & WEARING ${item.name}!`);
+            }
+          });
+        }
+      });
+
+      container.addEventListener('mouseleave', () => {
+        applyAllEquipped();
+      });
+    }
+
+    function renderMissionsUI() {
+      const container = document.getElementById('missions-list-container');
+      container.innerHTML = '';
+      MISSIONS.forEach(m => {
+        const isDone = completedMissions.includes(m.id);
+        const item = document.createElement('div');
+        item.className = 'mission-item';
+        item.innerHTML = `
+          <div class="mission-desc">
+            <strong>${m.title}</strong>
+            <span>${m.desc}</span>
+          </div>
+          <div class="mission-badge ${isDone ? 'done' : ''}">
+            ${isDone ? 'COMPLETED' : `+${m.reward} Orbs`}
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    // --- UI Listeners ---
+    function setupUIEvents() {
+      document.getElementById('btn-play').addEventListener('click', startRun);
+
+      document.getElementById('btn-hangar').addEventListener('click', () => {
+        audio.init();
+        renderWardrobeShopUI();
+        hangarModal.classList.remove('hidden');
+      });
+      document.getElementById('btn-close-hangar').addEventListener('click', () => hangarModal.classList.add('hidden'));
+      document.getElementById('btn-hangar-back').addEventListener('click', () => hangarModal.classList.add('hidden'));
+
+      // Category tab switcher: hat, shirt, pants, costume, skin color
+      document.querySelectorAll('.shop-tab-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          document.querySelectorAll('.shop-tab-btn').forEach(b => b.classList.remove('active'));
+          e.target.classList.add('active');
+          currentShopCategory = e.target.getAttribute('data-category');
+          renderWardrobeShopUI();
+        });
+      });
+
+      document.getElementById('btn-missions').addEventListener('click', () => {
+        audio.init();
+        renderMissionsUI();
+        missionsModal.classList.remove('hidden');
+      });
+      document.getElementById('btn-close-missions').addEventListener('click', () => missionsModal.classList.add('hidden'));
+      document.getElementById('btn-missions-back').addEventListener('click', () => missionsModal.classList.add('hidden'));
+
+      document.getElementById('btn-how-to-play').addEventListener('click', () => {
+        audio.init();
+        guideModal.classList.remove('hidden');
+      });
+      document.getElementById('btn-close-guide').addEventListener('click', () => guideModal.classList.add('hidden'));
+      document.getElementById('btn-guide-back').addEventListener('click', () => guideModal.classList.add('hidden'));
+
+      document.getElementById('btn-settings').addEventListener('click', () => {
+        audio.init();
+        settingsModal.classList.remove('hidden');
+      });
+      document.getElementById('btn-close-settings').addEventListener('click', () => settingsModal.classList.add('hidden'));
+      document.getElementById('btn-settings-back').addEventListener('click', () => settingsModal.classList.add('hidden'));
+
+      document.getElementById('setting-toggle-sound').addEventListener('click', (e) => {
+        audio.init();
+        audio.sfxMuted = !audio.sfxMuted;
+        e.target.innerText = audio.sfxMuted ? '🔇 Muted' : '🔊 Enabled';
+        document.getElementById('sound-btn').innerText = audio.sfxMuted ? '🔇' : '🔊';
+      });
+
+      document.getElementById('setting-toggle-music').addEventListener('click', (e) => {
+        audio.init();
+        audio.musicMuted = !audio.musicMuted;
+        if (!audio.musicMuted && gameState === STATE_PLAYING) audio.startMusic();
+        e.target.innerText = audio.musicMuted ? '🔇 Muted' : '🎵 Enabled';
+        document.getElementById('music-btn').innerText = audio.musicMuted ? '🔇' : '🎵';
+      });
+
+      document.getElementById('setting-reset-data').addEventListener('click', () => {
+        if (confirm("Reset high score, orbs, and wardrobe items?")) {
+          highScore = 0;
+          totalOrbs = 0;
+          completedMissions = [];
+          equipped = { hat: 'hat_catears', shirt: 'shirt_sailor', pants: 'pants_skirt', skin: 'skin_peach' };
+          unlockedItems = ['shirt_sailor', 'pants_skirt', 'skin_peach', 'skin_caramel', 'skin_snow', 'skin_cyan', 'skin_lilac'];
+          applyAllEquipped();
+          savePlayerData();
+          renderWardrobeShopUI();
+          renderMissionsUI();
+        }
+      });
+
+      document.getElementById('btn-resume').addEventListener('click', togglePause);
+      document.getElementById('btn-restart-from-pause').addEventListener('click', startRun);
+      document.getElementById('btn-home-from-pause').addEventListener('click', showHomeScreen);
+
+      document.getElementById('btn-retry').addEventListener('click', startRun);
+      document.getElementById('btn-home-from-over').addEventListener('click', showHomeScreen);
+
+      document.getElementById('pause-btn').addEventListener('click', togglePause);
+      document.getElementById('sound-btn').addEventListener('click', () => {
+        audio.init();
+        audio.sfxMuted = !audio.sfxMuted;
+        document.getElementById('sound-btn').innerText = audio.sfxMuted ? '🔇' : '🔊';
+      });
+      document.getElementById('music-btn').addEventListener('click', () => {
+        audio.init();
+        audio.musicMuted = !audio.musicMuted;
+        if (!audio.musicMuted && gameState === STATE_PLAYING) audio.startMusic();
+        document.getElementById('music-btn').innerText = audio.musicMuted ? '🔇' : '🎵';
+      });
+    }
+
+    // --- Controls ---
+    function onKeyDown(e) {
+      if (e.code === 'KeyP' || e.code === 'Escape') {
+        if (gameState === STATE_PLAYING || gameState === STATE_PAUSED) {
+          togglePause();
+          return;
+        }
+      }
+
+      if (gameState !== STATE_PLAYING) {
+        if (gameState === STATE_HOME && (e.code === 'Space' || e.code === 'Enter')) {
+          startRun();
+        } else if (gameState === STATE_GAMEOVER && (e.code === 'Space' || e.code === 'Enter')) {
+          startRun();
+        }
+        return;
+      }
+
+      if (e.code === 'KeyA' || e.code === 'ArrowLeft') {
+        if (currentLane > 0) {
+          currentLane--;
+          playerTargetX = LANES[currentLane];
+        }
+      } else if (e.code === 'KeyD' || e.code === 'ArrowRight') {
+        if (currentLane < 2) {
+          currentLane++;
+          playerTargetX = LANES[currentLane];
+        }
+      } else if (e.code === 'Space' || e.code === 'KeyW' || e.code === 'ArrowUp') {
+        if (!isJumping && !isSliding) {
+          isJumping = true;
+          playerVelocityY = JUMP_FORCE;
+          audio.playJump();
+        }
+      } else if (e.code === 'KeyS' || e.code === 'ArrowDown') {
+        if (!isSliding) {
+          startSlide();
+        }
+      }
+    }
+
+    function startSlide() {
+      isSliding = true;
+      slideTimer = SLIDE_DURATION;
+      audio.playSlide();
+      playerTorso.rotation.x = -0.7;
+      playerTorso.position.y = 0.35;
+      runStats.slide++;
+      checkMission('slide', runStats.slide);
+    }
+
+    function endSlide() {
+      isSliding = false;
+      playerTorso.rotation.x = 0;
+      playerTorso.position.y = 0.62;
+    }
+
+    function setupTouchControls() {
+      let touchStartX = 0, touchStartY = 0;
+      window.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].clientX;
+        touchStartY = e.changedTouches[0].clientY;
+      }, { passive: true });
+
+      window.addEventListener('touchend', (e) => {
+        const dx = e.changedTouches[0].clientX - touchStartX;
+        const dy = e.changedTouches[0].clientY - touchStartY;
+        if (gameState !== STATE_PLAYING) return;
+
+        if (Math.abs(dx) > Math.abs(dy)) {
+          if (dx > 40 && currentLane < 2) {
+            currentLane++;
+            playerTargetX = LANES[currentLane];
+          } else if (dx < -40 && currentLane > 0) {
+            currentLane--;
+            playerTargetX = LANES[currentLane];
+          }
+        } else {
+          if (dy < -40 && !isJumping && !isSliding) {
+            isJumping = true;
+            playerVelocityY = JUMP_FORCE;
+            audio.playJump();
+          } else if (dy > 40 && !isSliding) {
+            startSlide();
+          }
+        }
+      }, { passive: true });
+    }
+
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    // --- Main Game Loop ---
+    function animate(time) {
+      requestAnimationFrame(animate);
+
+      const delta = Math.min((time - (lastTime || time)) / 1000, 0.1);
+      lastTime = time;
+
+      // Rotate mini 3D preview item canvases safely using single engine when wardrobe is open!
+      if (!hangarModal.classList.contains('hidden') && previewEngine) {
+        previewEngine.renderAll();
+      }
+
+      frameCount++;
+      if (time - lastFpsUpdate > 500) {
+        fpsDisplay.innerText = Math.round((frameCount * 1000) / (time - lastFpsUpdate));
+        frameCount = 0;
+        lastFpsUpdate = time;
+      }
+
+      // Home Screen Idle Animation
+      if (gameState === STATE_HOME) {
+        player.position.y = Math.sin(time * 0.003) * 0.06;
+        playerHead.rotation.z = Math.sin(time * 0.002) * 0.08;
+        playerTorso.rotation.y = Math.sin(time * 0.002) * 0.25;
+        leftArm.rotation.x = Math.sin(time * 0.004) * 0.2;
+        rightArm.rotation.x = Math.sin(time * 0.004 + Math.PI) * 0.2;
+        leftLeg.rotation.x = 0;
+        rightLeg.rotation.x = 0;
+
+        for (let b of cityBuildings) {
+          b.position.z += 6 * delta;
+          if (b.position.z > 20) b.position.z = -TRACK_LENGTH * 1.5;
+        }
+      }
+
+      // Active Mission Gameplay
+      if (gameState === STATE_PLAYING) {
+        if (boostActive) {
+          boostDuration -= delta;
+          boostBar.style.width = `${Math.max(0, (boostDuration / 3.5) * 100)}%`;
+          speed = 68;
+          if (boostDuration <= 0) {
+            boostActive = false;
+            statusBoost.style.display = 'none';
+          }
+        } else {
+          speed = Math.min(speed + delta * 0.35, MAX_SPEED);
+        }
+
+        score += speed * delta;
+        distDisplay.innerText = `${Math.floor(score)} m`;
+        updateSectorTheme(score);
+
+        camera.fov = 65 + (speed - INITIAL_SPEED) * 0.35;
+        camera.updateProjectionMatrix();
+
+        player.position.x += (playerTargetX - player.position.x) * 16 * delta;
+
+        // Force character, torso, and head to face strictly straight forward during gameplay
+        player.rotation.set(0, 0, 0);
+        playerTorso.rotation.y = 0;
+        playerTorso.rotation.z = 0;
+        playerHead.rotation.set(0, 0, 0);
+
+        // Animated running limbs
+        const runCycle = time * 0.016 * (speed / 20);
+        if (!isJumping && !isSliding) {
+          leftLeg.rotation.x = Math.sin(runCycle) * 0.65;
+          rightLeg.rotation.x = -Math.sin(runCycle) * 0.65;
+          leftArm.rotation.x = -Math.sin(runCycle) * 0.6;
+          rightArm.rotation.x = Math.sin(runCycle) * 0.6;
+          playerTorso.position.y = 0.62 + Math.abs(Math.sin(runCycle * 2)) * 0.08;
+        } else if (isJumping) {
+          leftArm.rotation.x = 2.4;
+          rightArm.rotation.x = 2.4;
+          leftLeg.rotation.x = 0.3;
+          rightLeg.rotation.x = 0.3;
+        }
+
+        if (isSliding) {
+          slideTimer -= delta;
+          if (slideTimer <= 0) endSlide();
+        }
+
+        if (isJumping) {
+          player.position.y += playerVelocityY * delta;
+          playerVelocityY += GRAVITY * delta;
+          if (player.position.y <= 0) {
+            player.position.y = 0;
+            isJumping = false;
+            playerVelocityY = 0;
+          }
+        }
+
+        // Power-ups
+        if (shieldActive) {
+          shieldDuration -= delta;
+          shieldBar.style.width = `${Math.max(0, (shieldDuration / 10) * 100)}%`;
+          shieldMesh.rotation.y += 2 * delta;
+          if (shieldDuration <= 0) {
+            shieldActive = false;
+            shieldMesh.visible = false;
+            statusShield.style.display = 'none';
+          }
+        }
+
+        if (magnetActive) {
+          magnetDuration -= delta;
+          magnetBar.style.width = `${Math.max(0, (magnetDuration / 9) * 100)}%`;
+          if (magnetDuration <= 0) {
+            magnetActive = false;
+            statusMagnet.style.display = 'none';
+          }
+        }
+
+        emitFootsteps();
+
+        for (let b of cityBuildings) {
+          b.position.z += speed * 0.3 * delta;
+          if (b.position.z > 20) b.position.z = -TRACK_LENGTH * 1.5;
+        }
+
+        // Bounding Box
+        const playerBox = new THREE.Box3();
+        if (isSliding) {
+          playerBox.min.set(player.position.x - 0.45, 0, player.position.z - 0.5);
+          playerBox.max.set(player.position.x + 0.45, 0.45, player.position.z + 0.5);
+        } else {
+          playerBox.min.set(player.position.x - 0.45, player.position.y, player.position.z - 0.45);
+          playerBox.max.set(player.position.x + 0.45, player.position.y + 1.25, player.position.z + 0.45);
+        }
+
+        // Boost pads
+        for (let i = boostPads.length - 1; i >= 0; i--) {
+          const pad = boostPads[i];
+          pad.position.z += speed * delta;
+          if (player.position.distanceTo(pad.position) < 1.3) {
+            boostActive = true;
+            boostDuration = 3.5;
+            statusBoost.style.display = 'flex';
+            audio.playBoost();
+            shakeIntensity = 0.4;
+            triggerExplosion(pad.position, 0xf59e0b, 15);
+            scene.remove(pad);
+            boostPads.splice(i, 1);
+            runStats.boost++;
+            checkMission('boost', runStats.boost);
+            continue;
+          }
+          if (pad.position.z > 10) {
+            scene.remove(pad);
+            boostPads.splice(i, 1);
+          }
+        }
+
+        // Obstacles
+        for (let i = obstacles.length - 1; i >= 0; i--) {
+          const obs = obstacles[i];
+          obs.position.z += speed * delta;
+
+          if (obs.obstacleType === 'drone') {
+            obs.position.x += obs.moveDir * 2.2 * delta;
+            if (obs.position.x > 2.6) { obs.position.x = 2.6; obs.moveDir = -1; }
+            else if (obs.position.x < -2.6) { obs.position.x = -2.6; obs.moveDir = 1; }
+          }
+
+          const obsBox = new THREE.Box3();
+          if (obs.obstacleType === 'high_barrier') {
+            obsBox.min.set(obs.position.x - 1.2, 1.0, obs.position.z - 0.2);
+            obsBox.max.set(obs.position.x + 1.2, 1.7, obs.position.z + 0.2);
+          } else if (obs.obstacleType === 'low_hurdle') {
+            obsBox.min.set(obs.position.x - 1.0, 0, obs.position.z - 0.2);
+            obsBox.max.set(obs.position.x + 1.0, 0.5, obs.position.z + 0.2);
+          } else {
+            obsBox.min.set(obs.position.x - 0.5, 0, obs.position.z - 0.5);
+            obsBox.max.set(obs.position.x + 0.5, 1.1, obs.position.z + 0.5);
+          }
+
+          if (playerBox.intersectsBox(obsBox)) {
+            if (boostActive) {
+              triggerExplosion(obs.position, 0xf59e0b, 25);
+              scene.remove(obs);
+              obstacles.splice(i, 1);
+              continue;
+            } else if (shieldActive) {
+              shieldActive = false;
+              shieldMesh.visible = false;
+              statusShield.style.display = 'none';
+              audio.playShieldBreak();
+              shakeIntensity = 0.3;
+              triggerExplosion(obs.position, 0x10b981, 20);
+              scene.remove(obs);
+              obstacles.splice(i, 1);
+              continue;
+            } else {
+              handleGameOver();
+              break;
+            }
+          }
+
+          if (obs.position.z > 10) {
+            scene.remove(obs);
+            obstacles.splice(i, 1);
+            spawnWave(-TRACK_LENGTH);
+          }
+        }
+
+        // Collectibles
+        for (let i = collectibles.length - 1; i >= 0; i--) {
+          const coin = collectibles[i];
+          coin.position.z += speed * delta;
+          coin.rotation.y += 3.5 * delta;
+
+          if (magnetActive) {
+            const dist = player.position.distanceTo(coin.position);
+            if (dist < 14) {
+              coin.position.lerp(new THREE.Vector3(player.position.x, player.position.y + 0.6, player.position.z), 12 * delta);
+            }
+          }
+
+          if (player.position.distanceTo(coin.position) < 1.15) {
+            triggerExplosion(coin.position, 0xfacc15, 12);
+            audio.playCoin();
+            scene.remove(coin);
+            collectibles.splice(i, 1);
+            collectedCoins++;
+            coinsDisplay.innerText = collectedCoins;
+            runStats.orbs = collectedCoins;
+            checkMission('orbs', runStats.orbs);
+            continue;
+          }
+
+          if (coin.position.z > 10) {
+            scene.remove(coin);
+            collectibles.splice(i, 1);
+          }
+        }
+
+        // Power-ups
+        for (let i = powerups.length - 1; i >= 0; i--) {
+          const pw = powerups[i];
+          pw.position.z += speed * delta;
+          pw.rotation.y += 2.5 * delta;
+
+          if (player.position.distanceTo(pw.position) < 1.2) {
+            audio.playPowerup();
+            if (pw.powerupType === 'shield') {
+              shieldActive = true;
+              shieldDuration = 10;
+              shieldMesh.visible = true;
+              statusShield.style.display = 'flex';
+              triggerExplosion(pw.position, 0x10b981, 16);
+            } else if (pw.powerupType === 'magnet') {
+              magnetActive = true;
+              magnetDuration = 9;
+              statusMagnet.style.display = 'flex';
+              triggerExplosion(pw.position, 0x06b6d4, 16);
+            }
+            scene.remove(pw);
+            powerups.splice(i, 1);
+            continue;
+          }
+
+          if (pw.position.z > 10) {
+            scene.remove(pw);
+            powerups.splice(i, 1);
+          }
+        }
+      }
+
+      // Update Particle Pool
+      for (let p of thrusterPool) {
+        if (p.visible) {
+          p.position.z += (gameState === STATE_PLAYING ? speed * 0.4 : 3) * delta;
+          p.life -= delta;
+          p.scale.multiplyScalar(0.92);
+          if (p.life <= 0 || p.scale.x < 0.05) p.visible = false;
+        }
+      }
+
+      for (let p of explosionPool) {
+        if (p.visible) {
+          p.position.addScaledVector(p.vel, delta);
+          p.scale.multiplyScalar(0.93);
+          p.vel.y -= 15 * delta;
+          p.life -= delta;
+          if (p.life <= 0 || p.scale.x < 0.05) p.visible = false;
+        }
+      }
+
+      // Camera Shake
+      if (shakeIntensity > 0) {
+        camera.position.x = (Math.random() - 0.5) * shakeIntensity;
+        camera.position.y = 3.8 + (Math.random() - 0.5) * shakeIntensity;
+        shakeIntensity = Math.max(0, shakeIntensity - delta * 1.5);
+      } else {
+        camera.position.x = 0;
+        camera.position.y = 3.8;
+      }
+
+      renderer.render(scene, camera);
+    }
+
+    window.onload = init;
+  </script>
+</body>
+</html>
